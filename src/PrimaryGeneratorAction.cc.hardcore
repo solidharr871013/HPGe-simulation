@@ -1,0 +1,155 @@
+//
+// ********************************************************************
+// * License and Disclaimer                                           *
+// *                                                                  *
+// * The  Geant4 software  is  copyright of the Copyright Holders  of *
+// * the Geant4 Collaboration.  It is provided  under  the terms  and *
+// * conditions of the Geant4 Software License,  included in the file *
+// * LICENSE and available at  http://cern.ch/geant4/license .  These *
+// * include a list of copyright holders.                             *
+// *                                                                  *
+// * Neither the authors of this software system, nor their employing *
+// * institutes,nor the agencies providing financial support for this *
+// * work  make  any representation or  warranty, express or implied, *
+// * regarding  this  software system or assume any liability for its *
+// * use.  Please see the license in the file  LICENSE  and URL above *
+// * for the full disclaimer and the limitation of liability.         *
+// *                                                                  *
+// * This  code  implementation is the result of  the  scientific and *
+// * technical work of the GEANT4 collaboration.                      *
+// * By using,  copying,  modifying or  distributing the software (or *
+// * any work based  on the software)  you  agree  to acknowledge its *
+// * use  in  resulting  scientific  publications,  and indicate your *
+// * acceptance of all terms of the Geant4 Software license.          *
+// ********************************************************************
+//
+//
+/// \file  PrimaryGeneratorAction.cc
+/// \brief Implementation of the  PrimaryGeneratorAction class
+
+#include "PrimaryGeneratorAction.hh"
+
+#include "G4LogicalVolumeStore.hh"
+#include "G4LogicalVolume.hh"
+#include "G4Box.hh"
+#include "G4RunManager.hh"
+#include "G4ParticleGun.hh"
+#include "G4ParticleTable.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4SystemOfUnits.hh"
+#include "Randomize.hh"
+#include "G4PhysicalConstants.hh"
+#include "random"
+#include "G4GenericMessenger.hh"
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+ PrimaryGeneratorAction:: PrimaryGeneratorAction()
+: G4VUserPrimaryGeneratorAction(),
+  fMessenger(nullptr),
+  fParticleGun(nullptr),
+  xpos(0.),
+  ypos(0),
+  zpos(0.)
+{
+  G4int n_particle = 1;
+  fParticleGun  = new G4ParticleGun(n_particle);
+
+  DefineCommands();
+
+  // default particle kinematic
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4String particleName;
+  G4ParticleDefinition* particle
+    = particleTable->FindParticle(particleName="e-");
+  fParticleGun->SetParticleDefinition(particle);
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+  fParticleGun->SetParticleEnergy(80*keV);
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+ PrimaryGeneratorAction::~ PrimaryGeneratorAction()
+{
+    delete  fMessenger;
+    delete fParticleGun;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void  PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+{
+  //this function is called at the begining of ecah event
+  //
+
+  // In order to avoid dependence of PrimaryGeneratorAction
+  // on DetectorConstruction class we get Envelope volume
+  // from G4LogicalVolumeStore.
+
+
+
+
+
+
+    //the following code is for generating two seperated source, the source is aparted in
+    // the distance of source_divergence in x-axis.
+
+
+    //G4int randNumber = rand()%2;
+    G4double randNumber_r = (5*G4UniformRand())*mm,
+             randNumber_theta = 2*pi*G4UniformRand();
+    
+
+    //unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    //std::mt19937 generator (seed);
+    G4double source_x = randNumber_r*std::sin(randNumber_theta),
+             source_y = randNumber_r*std::cos(randNumber_theta);
+
+
+    //fParticleGun->SetParticleEnergy(80*keV);
+
+    fParticleGun->
+            SetParticleMomentumDirection
+            (G4ThreeVector(0,0,1));
+
+    fParticleGun->
+            SetParticlePosition(G4ThreeVector(source_x,source_y,-1*cm));
+
+
+    fParticleGun->GeneratePrimaryVertex(anEvent);
+
+}
+
+void  PrimaryGeneratorAction::DefineCommands(){
+    fMessenger = new G4GenericMessenger(this,
+                                        "/ Camera/gunpos/",
+                                        "gun Control");
+
+
+    auto& xposCmd
+      = fMessenger->DeclareMethodWithUnit("xpos","cm",
+                                  & PrimaryGeneratorAction::setPosX,
+                                  "Set x position for source.");
+    xposCmd.SetParameterName("xPosition", true);
+    xposCmd.SetRange("xPosition>=-10000. && xPosition<10000.");
+    xposCmd.SetDefaultValue("0");
+
+    auto& yposCmd
+      = fMessenger->DeclareMethodWithUnit("ypos","cm",
+                                  & PrimaryGeneratorAction::setPosY,
+                                  "Set y position for source.");
+    yposCmd.SetParameterName("yPosition", true);
+    yposCmd.SetRange("yPosition>=-10000. && yPosition<10000.");
+    yposCmd.SetDefaultValue("40");
+
+    auto& zposCmd
+      = fMessenger->DeclareMethodWithUnit("zpos","cm",
+                                  & PrimaryGeneratorAction::setPosZ,
+                                  "Set z position for source.");
+    zposCmd.SetParameterName("zPosition", true);
+    zposCmd.SetRange("zPosition>=-10000. && zPosition<10000.");
+    zposCmd.SetDefaultValue("-40.");
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+

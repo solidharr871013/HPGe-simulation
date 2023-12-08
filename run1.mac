@@ -1,0 +1,88 @@
+# test01
+#
+/run/initialize
+#####################
+## particle type
+#####################
+/gps/particle gamma
+
+######################
+## particle shape and position
+######################
+
+#circle source
+#/gps/pos/type Plane
+#/gps/pos/shape Circle
+#/gps/pos/radius 0.4 cm
+#/gps/pos/centre 0. 0. 0. cm
+
+
+######################
+## particle angular
+#######################
+/gps/ang/type iso
+/gps/ang/mintheta 0 deg
+/gps/ang/maxtheta 180 deg
+
+###########################
+### Eu-152 calibration
+##############################
+# energy distribution
+/gps/ene/type Arb
+/gps/hist/file Eu-152.dat
+/gps/hist/inter Lin
+
+################################
+###### run 
+#########################################
+#/gps/direction 0 0 1
+# commands below are independent of gps
+# 
+###/control/execute vis.mac
+#
+/run/printProgress 10000
+#
+#/run/beamOn 5000000
+
+###########################
+### Co-60 calibration
+##############################
+# energy distribution
+/gps/ene/type Arb
+/gps/hist/file Co-60.dat
+/gps/hist/inter Lin
+
+################################
+###### run 
+#########################################
+#/gps/direction 0 0 1
+# commands below are independent of gps
+# 
+###/control/execute vis.mac
+#
+/run/printProgress 10000
+#
+#/run/beamOn 5000000
+
+###########################
+### Cs-137 calibration
+##############################
+# energy distribution
+/gps/ene/type Arb
+/gps/hist/file Cs-137.dat
+/gps/hist/inter Lin
+
+################################
+###### run 
+#########################################
+#/gps/direction 0 0 1
+# commands below are independent of gps
+# 
+###/control/execute vis.mac
+#
+/run/printProgress 10000
+#
+#/run/beamOn 5000000
+
+
+

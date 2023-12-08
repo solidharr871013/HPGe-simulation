@@ -1,0 +1,48 @@
+# test01
+#
+/run/initialize
+#####################
+## particle type ####
+#####################
+/gps/particle ion
+#Atomic Number / Atomic Mass / Charge of ion / Excitation energy in keV
+/gps/ion 63 152 0 0 
+#################################
+## particle shape and position ##
+#################################
+
+#circle source
+/gps/pos/type Plane
+/gps/pos/shape Circle
+/gps/pos/radius 0.4 cm
+/gps/pos/centre 0. 0. 204.4 mm
+
+
+#######################
+## particle angular ###
+#######################
+#/gps/ang/type iso
+#/gps/ang/mintheta 0 deg
+#/gps/ang/maxtheta 360 deg
+
+/gps/energy 0. eV #at rest to study decay
+#/run/beamOn 1000
+
+###########################
+###### Eu-152 run #########
+###########################
+#/gps/direction 0 0 1
+# commands below are independent of gps
+# 
+###/control/execute vis.mac
+
+#/analysis/setFileName Eu-152
+#
+/run/printProgress 10000
+#
+#/run/beamOn 5000000
+
+
+
+
+
